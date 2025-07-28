@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/auto-commit.git"
+    "url": "https://github.com/Msg-Lbo/auto-commit.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/auto-commit/issues"
+    "url": "https://github.com/Msg-Lbo/auto-commit/issues"
   },
-  "homepage": "https://github.com/your-username/auto-commit#readme",
+  "homepage": "https://github.com/Msg-Lbo/auto-commit#readme",
   "license": "MIT",
   "activationEvents": [
     "onView:scm"
