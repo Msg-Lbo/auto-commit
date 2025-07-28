@@ -29,14 +29,14 @@
 
 ```json
 {
-  "auto-commit.deepseekApiKey": "your-deepseek-api-key-here"
+  "auto-commit.apiKey": "your-deepseek-api-key-here"
 }
 ```
 
 ### 可选配置
 ```json
 {
-  "auto-commit.defaultCommitTemplate": "feat: {description}",
+  "auto-commit.apiUrl": "https://api.deepseek.com/v1/chat/completions",
   "auto-commit.systemPrompt": "你是一个专业的Git提交消息生成助手...",
   "auto-commit.userPromptTemplate": "请为以下代码变更生成提交消息：\n{files}\n{changes}\n{history}"
 }

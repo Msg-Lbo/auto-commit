@@ -4,50 +4,52 @@ import { DeepSeekService } from './services/deepSeekService';
 import { CommitMessageGenerator } from './services/commitMessageGenerator';
 
 export function activate(context: vscode.ExtensionContext) {
-    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    statusBarItem.command = 'auto-commit.generateMessage';
-    statusBarItem.text = '$(sparkle) 生成提交消息';
-    statusBarItem.tooltip = '使用AI生成提交消息';
+    try {
+        const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+        statusBarItem.command = 'auto-commit.generateMessage';
+        statusBarItem.text = '$(sparkle) 生成提交消息';
+        statusBarItem.tooltip = '使用AI生成提交消息';
 
-    const updateStatusBarVisibility = async () => {
-        try {
-            const gitService = new GitService();
-            const isGitRepo = await gitService.isGitRepository();
-            if (isGitRepo) {
-                statusBarItem.show();
-            } else {
+        const updateStatusBarVisibility = async () => {
+            try {
+                const gitService = new GitService();
+                const isGitRepo = await gitService.isGitRepository();
+                if (isGitRepo) {
+                    statusBarItem.show();
+                } else {
+                    statusBarItem.hide();
+                }
+            } catch (error) {
                 statusBarItem.hide();
             }
-        } catch (error) {
-            statusBarItem.hide();
-        }
-    };
+        };
 
-    vscode.workspace.onDidChangeWorkspaceFolders(updateStatusBarVisibility);
-    updateStatusBarVisibility();
+        vscode.workspace.onDidChangeWorkspaceFolders(updateStatusBarVisibility);
+        updateStatusBarVisibility();
 
-    const disposable = vscode.commands.registerCommand('auto-commit.generateMessage', async () => {
-        try {
-            const gitService = new GitService();
-            const isGitRepo = await gitService.isGitRepository();
-            if (!isGitRepo) {
-                vscode.window.showErrorMessage('当前不在Git仓库中');
-                return;
+        const disposable = vscode.commands.registerCommand('auto-commit.generateMessage', async () => {
+            try {
+                const gitService = new GitService();
+                const isGitRepo = await gitService.isGitRepository();
+                if (!isGitRepo) {
+                    vscode.window.showErrorMessage('当前不在Git仓库中');
+                    return;
+                }
+
+                await generateCommitMessage();
+            } catch (error) {
+                vscode.window.showErrorMessage(`生成提交消息失败: ${error}`);
             }
+        });
 
-            await generateCommitMessage();
-        } catch (error) {
-            vscode.window.showErrorMessage(`生成提交消息失败: ${error}`);
-        }
-    });
+        const quickGenerateDisposable = vscode.commands.registerCommand('auto-commit.quickGenerate', async () => {
+            await vscode.commands.executeCommand('auto-commit.generateMessage');
+        });
 
-    const quickGenerateDisposable = vscode.commands.registerCommand('auto-commit.quickGenerate', async () => {
-        await vscode.commands.executeCommand('auto-commit.generateMessage');
-    });
-
-    context.subscriptions.push(disposable, quickGenerateDisposable, statusBarItem);
-
-    vscode.window.showInformationMessage('自动提交消息生成器已激活！');
+        context.subscriptions.push(disposable, quickGenerateDisposable, statusBarItem);
+    } catch (error) {
+        vscode.window.showErrorMessage(`扩展激活失败: ${error}`);
+    }
 }
 
 async function generateCommitMessage() {

@@ -1,14 +1,14 @@
 {
   "name": "auto-commit",
-  "displayName": "自动提交消息生成器",
+  "displayName": "AI提交消息生成器",
   "description": "使用DeepSeek AI智能生成Git提交消息的VSCode插件",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "Msg-Lbo",
   "author": {
     "name": "Msg-Lbo",
     "email": "msglbo@foxmail.com"
   },
-  "icon": "icon.png",
+  "icon": "logo.png",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -23,8 +23,7 @@
     "ai",
     "deepseek",
     "自动提交",
-    "提交消息",
-    "人工智能"
+    "提交消息"
   ],
   "repository": {
     "type": "git",
@@ -36,10 +35,11 @@
   "homepage": "https://github.com/Msg-Lbo/auto-commit#readme",
   "license": "MIT",
   "activationEvents": [
-    "onView:scm"
+    "onCommand:auto-commit.generateMessage",
+    "onCommand:auto-commit.quickGenerate"
   ],
 
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -106,14 +106,14 @@
         "auto-commit.systemPrompt": {
           "type": "string",
           "editPresentation": "multilineText",
-          "default": "你是一个专业的Git提交消息生成助手。请根据代码变更生成简洁、准确的提交消息。遵循约定式提交格式（feat:, fix:, docs:, style:, refactor:, test:, chore:）。提交消息的第一行应控制在72个字符以内。",
+          "default": "你是一个专业的Git提交消息生成助手。请根据文件的实际变更状态生成一条统一的提交消息。\\n\\n格式要求：\\n- 只生成一条提交消息，不要生成多条\\n- 用逗号分隔多个变更内容\\n- 控制在200个字符以内\\n- 格式：type: 主要变更描述，次要变更1，次要变更2\\n\\n类型选择：\\n- 如果有新文件，优先使用 feat:\\n- 如果只有修改文件，使用 fix: 或 refactor: 或 style:\\n- 如果有删除文件，使用 chore:\\n\\n重要：只返回一条完整的提交消息！",
           "description": "AI系统提示词，定义AI的角色和行为",
           "scope": "application"
         },
         "auto-commit.userPromptTemplate": {
           "type": "string",
           "editPresentation": "multilineText",
-          "default": "请为以下代码变更生成一个提交消息：\n\n文件变更：\n{files}\n\n变更详情：\n{changes}\n\n历史提交消息参考：\n{history}\n\n请生成一个简洁、准确的提交消息，只返回消息内容，不要其他解释。",
+          "default": "请根据以下代码变更生成一条统一的Git提交消息：\\n\\n文件变更：\\n{files}\\n\\n变更详情：\\n{changes}\\n\\n历史提交消息参考：\\n{history}\\n\\n重要要求：\\n1. 只生成一条提交消息，绝对不要生成多条消息\\n2. 用逗号分隔多个变更内容\\n3. 控制在200个字符以内\\n4. 格式：type: 主要变更描述，次要变更1，次要变更2\\n5. 如果有新文件优先用feat:，只有修改文件用fix:/refactor:/style:\\n6. 只返回一条完整的提交消息，不要任何解释或多条消息",
           "description": "用户提示词模板，支持变量：{files}, {changes}, {history}",
           "scope": "application"
         }
@@ -121,14 +121,21 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run package",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-web": "webpack",
+    "watch-web": "webpack --watch",
+    "package-web": "webpack --mode production --devtool hidden-source-map"
   },
   "devDependencies": {
     "@types/vscode": "^1.74.0",
     "@types/node": "16.x",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "ts-loader": "^9.5.1"
   },
   "extensionDependencies": [
     "vscode.git"
